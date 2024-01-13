@@ -1,0 +1,78 @@
+version: "3.7"
+services:
+  front-envoy:
+    image: emulator_envoy:latest
+    container_name: emulator_envoy
+    networks:
+      - envoymesh
+    expose:
+      - "8080"
+      - "8001"
+    ports:
+      - "80:8080"
+      - "443:8080"
+      - "8001:8001"
+      - "8080:8080"
+  emulator:
+    #build:
+     # context: ../../bld/
+     # dockerfile: Dockerfile
+    image: emulator_emulator:latest
+    container_name: emulator_emulator
+    networks:
+      envoymesh:
+        aliases:
+          - emulator
+    devices: [/dev/kvm]
+    shm_size: 128M
+    expose:
+      - "8554"
+    #environment:
+     # - TURN=curl -s http://125-31-104-223.ppp.bbiq.jp:5000/turn/localhost?apiKey=supersafe
+    #command: >
+     # - /android/sdk/emulator/
+     #- avd Pixel2
+      #-gpu off
+      #-camera-back none
+      #-camera-front none
+      #-qemu
+      #-netdev user,id=mynet0,hostfwd=tcp::3478-8554,host=125.31.104.223
+      #-device virtio-net-pci,netdev=mynet0
+  #coturn:
+   # image:
+    #container_name: coturn
+    #environment:
+     # - TURN_SECRET=70dd641e27989c487f3a7e39138ce90f3bf19662def3ca49794ed43266694607
+      #- TURN_SERVER_NAME=125-31-104-223.ppp.bbiq.jp
+    #networks:
+     # - envoymesh
+
+
+  #jwt_signer:
+  #  image: emulator_jwt_signer:latest
+  #  container_name: emulator_jwt_signer
+  #  networks:
+  #    envoymesh:
+  #      aliases:
+  #        - jwt_signer
+  #  expose:
+  #    - "8080"
+
+  nginx:
+    image: emulator_nginx:latest
+    # network_mode: "host"
+    container_name: emulator_nginx
+    networks:
+      envoymesh:
+        aliases:
+          - nginx
+    expose:
+      - "80"
+
+
+
+
+networks:
+  envoymesh: {}
+
+  #external: true
